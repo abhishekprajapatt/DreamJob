@@ -36,4 +36,3 @@ const CategoryCarousel = () => {
 
 export default CategoryCarousel;
 
-// time 5.00.00
