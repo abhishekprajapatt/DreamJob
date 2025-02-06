@@ -12,23 +12,23 @@ import { Button } from './ui/button';
 import { Loader2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import { setUser } from '@/redux/authSlice';
+import { setLoading, setUser } from '@/redux/authSlice';
 import { toast } from 'sonner';
 
 const UpdateProfileDialog = ({ open, setOpen }) => {
   const [loding, setLoding] = useState(false);
   const { user } = useSelector((store) => store.auth);
   const [input, setInput] = useState({
-    fullname: user.fullname,
-    email: user.email,
-    phoneNumber: user.phoneNumber,
-    bio: user.profile.bio,
-    skills: user.profile.skills.map((skill) => skill),
-    file: user.profile.resume,
+    fullname: user.fullname || "",
+    email: user.email || "",
+    phoneNumber: user.phoneNumber || "",
+    bio: user.profile.bio || "",
+    skills: user.profile.skills.map((skill) => skill) || "",
+    file: user.profile.resume || "",
   });
   const dispatch = useDispatch();
 
-  const changeEventHandler = () => {
+  const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
@@ -49,6 +49,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
       formData.append('file', input.file);
     }
     try {
+      setLoading(true);
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/profile/update`,
         formData,
@@ -66,6 +67,8 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
     setOpen(false);
     console.log(input);
@@ -88,8 +91,8 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 </Label>
                 <Input
                   id="name"
-                  type="text"
                   name="name"
+                  type="text"
                   value={input.fullname}
                   onChange={changeEventHandler}
                   className="col-span-3"
@@ -139,8 +142,8 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                   Skills
                 </Label>
                 <Input
-                  id="skills"
                   type="text"
+                  id="skills"
                   name="skills"
                   value={input.skills}
                   onChange={changeEventHandler}
@@ -153,11 +156,11 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 </Label>
                 <Input
                   id="file"
-                  accept="application/pdf"
-                  value={input.file}
-                  onChange={fileChangeHandler}
                   name="file"
                   type="file"
+                  accept="application/pdf"
+                  // value={input?.file}
+                  onChange={fileChangeHandler}
                   className="col-span-3"
                 />
               </div>
