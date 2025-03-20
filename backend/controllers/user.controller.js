@@ -12,7 +12,11 @@ export const register = async (req, res) => {
         message: 'Somthing is missing...!',
         success: false,
       });
-    }
+    };
+
+    const file = req.file;
+    const fileUri = getDataUri(file);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
     const user = await User.findOne({ email });
     if (user) {
@@ -29,6 +33,9 @@ export const register = async (req, res) => {
       phoneNumber,
       password: hashPassword,
       role,
+      profile:{
+        profilePhoto:cloudResponse.secure_url,
+      }
     });
 
     return res.status(201).json({
@@ -56,7 +63,7 @@ export const login = async (req, res) => {
     let user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
-        message: 'Incorrect email or password...!',
+        message: 'Incorrect email...!',
         success: false,
       });
     }
@@ -64,7 +71,7 @@ export const login = async (req, res) => {
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
       return res.status(400).json({
-        message: 'Incorrect email or password...!',
+        message: 'Incorrect  password...!',
         success: false,
       });
     }
@@ -151,7 +158,7 @@ export const updateProfile = async (req, res) => {
     if (skills) user.profile.skills = skillsArray;
 
     if(cloudResponse){
-      user.profile.resume = cloudResponse.SECRET_KEY
+      user.profile.resume = cloudResponse.secure_url
       user.profile.resumeOriginal = file.originalname
     }
     await user.save();

@@ -9,9 +9,10 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading } from '@/redux/authSlice';
+import { Loader2 } from 'lucide-react';
 
 const Signup = () => {
-  const {loading} = useSelector(store => store.auth);
+  const { loading } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [input, setInput] = useState({
@@ -61,7 +62,7 @@ const Signup = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
-    }finally{
+    } finally {
       dispatch(setLoading(false));
     }
   };
@@ -150,7 +151,14 @@ const Signup = () => {
             </div>
           </div>
           <Button type="submit" className="w-full my-4">
-            Signup
+            {' '}
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 w-4 h-4 animate-spin" /> Please Wait...{' '}
+              </>
+            ) : (
+              'Signup'
+            )}
           </Button>
           <span className="text-sm">
             Already have a account?{' '}
