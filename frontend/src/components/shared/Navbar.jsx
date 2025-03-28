@@ -28,7 +28,7 @@ const Navbar = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "Logout failed");
+      toast.error(error.response?.data?.message || 'Logout failed');
     }
   };
 
@@ -37,20 +37,34 @@ const Navbar = () => {
       <div className="flex items-center justify-between mx-auto max-w-7xl h-16">
         <div>
           <h1 className="text-2xl font-bold text-[#7525c6]">
-            Dream <span className="text-[#f86402]">Job</span>{!user && <h1 className='text-black'>User not here</h1>}
+            Dream <span className="text-[#f86402]">Job</span>
+            {!user && <h1 className="text-black">User not here</h1>}
           </h1>
         </div>
         <div className="flex items-center gap-2">
           <ul className="flex font-medium items-center gap-5">
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/jobs">Jobs</Link>
-            </li>
-            <li>
-              <Link to="/browse">Browse</Link>
-            </li>
+            {user && user.role === 'recruiter' ? (
+              <>
+                <li>
+                  <Link to="/admin/companies">Companies</Link>
+                </li>
+                <li>
+                  <Link to="/admin/jobs">Jobs</Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link to="/">Home</Link>
+                </li>
+                <li>
+                  <Link to="/jobs">Jobs</Link>
+                </li>
+                <li>
+                  <Link to="/browse">Browse</Link>
+                </li>
+              </>
+            )}
           </ul>
           {!user ? (
             <div className="flex items-center gap-2">
@@ -65,7 +79,10 @@ const Navbar = () => {
             <Popover>
               <PopoverTrigger asChild>
                 <Avatar
-                  src={user?.profile?.profilePhoto || "https://via.placeholder.com/50"}
+                  src={
+                    user?.profile?.profilePhoto ||
+                    'https://via.placeholder.com/50'
+                  }
                   round={true}
                   size="50px"
                   className="cursor-pointer"
@@ -75,24 +92,31 @@ const Navbar = () => {
                 <div className="">
                   <div className="flex gap-2 space-y-2">
                     <Avatar
-                      src={user?.profile?.profilePhoto || "https://via.placeholder.com/50"}
+                      src={
+                        user?.profile?.profilePhoto ||
+                        'https://via.placeholder.com/50'
+                      }
                       round={true}
                       size="50px"
                       className="cursor-pointer"
                     />
                     <div className="">
-                      <h4 className="font-medium">{user?.fullname || "User"}</h4>
+                      <h4 className="font-medium">
+                        {user?.fullname || 'User'}
+                      </h4>
                       <p className="text-sm text-muted-foreground">
-                        {user?.profile?.bio || "No bio available"}
+                        {user?.profile?.bio || 'No bio available'}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-col gap-3 text-gray-600">
-                    <div className="flex w-fit items-center gap-2 cursor-pointer">
-                      <Button variant="link">
-                        <Link to="/profile">View Profile</Link>
-                      </Button>
-                    </div>
+                    {user && user.role === 'student' && (
+                      <div className="flex w-fit items-center gap-2 cursor-pointer">
+                        <Button variant="link">
+                          <Link to="/profile">View Profile</Link>
+                        </Button>
+                      </div>
+                    )}
                     <div className="flex w-fit items-center gap-2 cursor-pointer">
                       <Button onClick={logoutHandler} variant="link">
                         Logout
