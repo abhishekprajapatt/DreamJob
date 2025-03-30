@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import Navbar from '../shared/Navbar';
 import { Button } from '../ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Label } from '@radix-ui/react-label';
 import { Input } from '../ui/input';
+import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const CompanySetup = () => {
   const [input, setInput] = useState({
@@ -13,18 +16,64 @@ const CompanySetup = () => {
     location: '',
     file: null,
   });
+  const [loading, setLoading] = useState(false);
+  const params = useParams();
+  const navigate = useNavigate();
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
+
+  const changeFileHandler = (e) => {
+    const file = e.target.files?.[0];
+    setInput({ ...input, file });
+  };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('name', input.name);
+    formData.append('description', input.description);
+    formData.append('website', input.website);
+    formData.append('location', input.location);
+    if (input.file) {
+      formData.append('file', input.file);
+    }
+    console.log(input);
+    try {
+      setLoading(true);
+      const res = await axios.put(
+        `${import.meta.env.VITE_BACKNED_URL}/api/v1/company/update/${
+          params.id
+        }`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          withCredentials: true,
+        }
+      );
+
+      if (res.data.success) {
+        toast.success(res.data.message);
+        navigate('/admin/companies');
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   return (
     <div>
       <Navbar />
       <div className="max-w-xl mx-auto my-10">
-        <form action="" className="">
+        <form onClick={submitHandler} className="">
           <div className="flex items-center gap-5 p-8">
             <Button
               variant="outline"
+              onClick={() => navigate("/admin/companies")}
               className="flex items-center gap-2 text-gray-500 font-semibold"
             >
               <ArrowLeft />
@@ -43,33 +92,52 @@ const CompanySetup = () => {
               />
             </div>
             <div>
-              <Label>Company Name</Label>
+              <Label>Description</Label>
               <Input
                 type="text"
-                name="name"
-                value={input.name}
+                name="description"
+                value={input.description}
                 onChange={changeEventHandler}
               />
             </div>
             <div>
-              <Label>Company Name</Label>
+              <Label>WebSite</Label>
               <Input
                 type="text"
-                name="name"
-                value={input.name}
+                name="website"
+                value={input.website}
                 onChange={changeEventHandler}
               />
             </div>
             <div>
-              <Label>Company Name</Label>
+              <Label>Location</Label>
               <Input
                 type="text"
-                name="name"
-                value={input.name}
+                name="location"
+                value={input.location}
                 onChange={changeEventHandler}
+              />
+            </div>
+            <div>
+              <Label>Logo</Label>
+              <Input
+                type="file"
+                name="file"
+                accept="image/*"
+                onChange={changeFileHandler}
               />
             </div>
           </div>
+          <Button type="submit" className="w-full mt-8">
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> please wait...
+              </>
+            ) : (
+              'Update'
+            )}
+            Update
+          </Button>
         </form>
       </div>
     </div>

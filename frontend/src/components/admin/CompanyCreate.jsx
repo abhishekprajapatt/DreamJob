@@ -4,7 +4,6 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
-import { aw } from 'framer-motion/dist/types.d-CdW9auKD';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
