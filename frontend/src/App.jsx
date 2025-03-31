@@ -55,7 +55,6 @@ const appRouter = createBrowserRouter([
     element: <CompanySetup />,
   },
 ]);
-
 const App = () => {
   return (
     <>
